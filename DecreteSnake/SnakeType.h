@@ -7,6 +7,7 @@ using namespace std;
 
 /*define*/
 typedef int SnakeHandle;
+typedef pair<int, int> pos;
 
 class SnakeType
 {
@@ -25,9 +26,14 @@ public:
     //if snake alive
     bool state;
 
+    //pos
+    vector<pos> bodys;
+
+    //
+
     /*functions*/
     SnakeType(int ol = 5, int os = 1, ColorType color = ColorType::Black, double sr = -0.5)
-        : orignLength(ol), orignSpeed(os), StepReward(sr), Color(color), state(1)
+        : orignLength(ol), orignSpeed(os), StepReward(sr), StepRewards(0), Color(color), state(1)
     {
         this->Length = orignLength;
         this->Speed = orignSpeed;
