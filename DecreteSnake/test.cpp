@@ -1,7 +1,9 @@
-#include "SnakeType.h"
+#include <bits/stdc++.h>
+#include <unistd.h>
+using namespace std;
 
 int main()
 {
-    SnakeType s;
-    cout<<int(s.Color);
+    enum class color{white,black};
+    cout<<int(color::white);
 }
