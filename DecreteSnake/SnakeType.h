@@ -4,6 +4,7 @@
 using namespace std;
 
 #include "./ColorType.h"
+#include "./Turn.h"
 
 /*define*/
 typedef int SnakeHandle;
@@ -29,7 +30,8 @@ public:
     //pos
     vector<pos> bodys;
 
-    //
+    //turn
+    Turn turn;
 
     /*functions*/
     SnakeType(int ol = 5, int os = 1, ColorType color = ColorType::Black, double sr = -0.5)

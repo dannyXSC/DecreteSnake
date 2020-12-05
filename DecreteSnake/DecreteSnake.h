@@ -19,21 +19,45 @@ private:
 
 public:
     DecreteSnake(Config config);
-
+    bool init_snake(SnakeHandle snake_handle, pos head, Turn turn);
     bool add_wall(vector<pos> list, AgentType &wall);
     bool random_add_wall(int number, AgentType &wall);
 
     bool add_food(vector<pos> list, AgentType &food);
     bool random_add_food(int number, AgentType &food);
 
-    Map& get_map(){return this->map;}
+    Map &get_map() { return this->map; }
 
     bool step();
 };
 
+bool DecreteSnake::init_snake(SnakeHandle snake_handle, pos head, Turn turn)
+{
+    int x, y;
+    int x_affect, y_affect;
+    int i, j;
+    for (i = 0; i < list_head.size(); i++)
+    {
+        x = list_head[i].first;
+        y = list_head[i].second;
+        x_affect = Turn_Xaffect[int(list_turn[i])];
+        y_affect = Turn_Yaffect[int(list_turn[i])];
+        for (j = 0; j < snakes[snake_handles[i]].orignLength; j++)
+        {
+            if (map.can_visit(x + j * x_affect, y + j * y_affect) == false)
+            {
+                return false;
+            }
+        }
+        for (j = 0; j < snakes[snake_handles[i]].orignLength; j++)
+        {
+            map.add_body(x + j * x_affect, y + j * y_affect, snakes[snake_handles[i]]);
+        }
+    }
+}
+
 bool DecreteSnake::step()
 {
-    
 }
 
 DecreteSnake::DecreteSnake(Config config) : map(config.length, config.width)
