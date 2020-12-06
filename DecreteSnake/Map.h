@@ -46,7 +46,7 @@ private:
     }
 
 public:
-    Map(int length, int width);
+    Map(int length = 0, int width = 0);
     Map(Map &m) { duplicate(m); }
     ~Map()
     {
@@ -143,7 +143,7 @@ AgentType *Map::delete_buff(int x, int y)
 
 AgentType *Map::delete_wall(int x, int y)
 {
-    if (!can_visit(x, y))
+    if (slots[x][y].slot_type == SlotType::OBSTACLE)
     {
         AgentType *p = (AgentType *)slots[x][y].container;
         slots[x][y].slot_type = SlotType::BLANK;
@@ -157,7 +157,7 @@ AgentType *Map::delete_wall(int x, int y)
 
 SnakeType *Map::delete_body(int x, int y)
 {
-    if (can_visit(x, y) && slots[x][y].occ_type == OccupyType::OCC_BODY)
+    if (slots[x][y].slot_type != SlotType::OBSTACLE && slots[x][y].occ_type == OccupyType::OCC_BODY)
     {
         SnakeType *p = (SnakeType *)slots[x][y].occupier;
         slots[x][y].occ_type = OccupyType::OCC_NONE;
@@ -169,7 +169,7 @@ SnakeType *Map::delete_body(int x, int y)
 
 AgentType *Map::delete_food(int x, int y)
 {
-    if (can_visit(x, y) && slots[x][y].occ_type == OccupyType::OCC_FOOD)
+    if (slots[x][y].slot_type != SlotType::OBSTACLE && slots[x][y].occ_type == OccupyType::OCC_FOOD)
     {
         AgentType *p = (AgentType *)slots[x][y].occupier;
         slots[x][y].occ_type = OccupyType::OCC_NONE;
@@ -181,7 +181,7 @@ AgentType *Map::delete_food(int x, int y)
 
 bool Map::add_buff(int x, int y, AgentType &buff)
 {
-    if (!can_visit(x, y))
+    if (slots[x][y].slot_type == SlotType::OBSTACLE)
     {
         return false;
     }
@@ -214,7 +214,7 @@ bool Map::add_food(int x, int y, AgentType &food)
 
 bool Map::add_wall(int x, int y, AgentType &wall)
 {
-    if (can_visit(x, y))
+    if (slots[x][y].slot_type == SlotType::OBSTACLE)
     {
         return false;
     }
@@ -226,22 +226,25 @@ bool Map::add_wall(int x, int y, AgentType &wall)
 
 Map::Map(int length, int width)
 {
-    this->length = length;
-    this->width = width;
-    this->slots = new MapSlot *[length];
-    if (this->slots == NULL)
+    if (length != 0 && width != 0)
     {
-        //error
-        cout << "overflow!" << endl;
-        exit(-1);
-    }
-    for (int i = 0; i < length; i++)
-    {
-        this->slots[i] = new MapSlot[width];
-        if (this->slots[i] == NULL)
+        this->length = length;
+        this->width = width;
+        this->slots = new MapSlot *[length];
+        if (this->slots == NULL)
         {
-            cout << "overflow" << endl;
+            //error
+            cout << "overflow!" << endl;
             exit(-1);
+        }
+        for (int i = 0; i < length; i++)
+        {
+            this->slots[i] = new MapSlot[width];
+            if (this->slots[i] == NULL)
+            {
+                cout << "overflow" << endl;
+                exit(-1);
+            }
         }
     }
 }
@@ -252,7 +255,7 @@ inline bool Map::can_visit(int x, int y)
     {
         return false;
     }
-    if (slots[x][y].slot_type == SlotType::BLANK || slots[x][y].slot_type == SlotType::BUFF)
+    if ((slots[x][y].slot_type == SlotType::BLANK || slots[x][y].slot_type == SlotType::BUFF) && slots[x][y].occ_type != OccupyType::OCC_BODY)
     {
         return true;
     }

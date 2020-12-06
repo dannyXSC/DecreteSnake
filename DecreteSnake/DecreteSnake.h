@@ -6,6 +6,9 @@ using namespace std;
 
 #include "./Config.h"
 #include "./Map.h"
+#include "./CleanMode.h"
+
+typedef DecreteSnake* GameHandle;
 
 class DecreteSnake
 {
@@ -28,36 +31,59 @@ public:
 
     Map &get_map() { return this->map; }
 
-    bool step();
+    bool clean_dead(SnakeHandle snake_handle,CleanMode mode);
+
+    bool step(SnakeHandle snake_handle,CleanMode mode);
+
+    bool if_end(SnakeHandle snake_handle,Turn turn);
 };
+
+bool DecreteSnake::step(SnakeHandle snake_handle,CleanMode mode)
+{
+    SnakeType snake = snakes[snake_handle];
+    SlotType slot;
+    int head_x, head_y;
+    int x_affect, y_affect;
+    int next_x, next_y;
+
+    head_x = snake.bodys[0].first;
+    head_y = snake.bodys[0].second;
+    x_affect = Turn_Xaffect[int(snake.turn)];
+    y_affect = Turn_Yaffect[int(snake.turn)];
+    next_x = head_x + x_affect;
+    next_y = head_y + y_affect;
+
+    if (map.can_visit(next_x, next_y) == false)
+    {
+        //wall
+        clean_dead(snake_handle,mode);
+    }
+}
 
 bool DecreteSnake::init_snake(SnakeHandle snake_handle, pos head, Turn turn)
 {
     int x, y;
     int x_affect, y_affect;
     int i, j;
-    for (i = 0; i < list_head.size(); i++)
+
+    x = head.first;
+    y = head.second;
+    x_affect = Turn_Xaffect[int(turn)];
+    y_affect = Turn_Yaffect[int(turn)];
+    for (j = 0; j < snakes[snake_handle].orignLength; j++)
     {
-        x = list_head[i].first;
-        y = list_head[i].second;
-        x_affect = Turn_Xaffect[int(list_turn[i])];
-        y_affect = Turn_Yaffect[int(list_turn[i])];
-        for (j = 0; j < snakes[snake_handles[i]].orignLength; j++)
+        if (map.can_visit(x + j * x_affect, y + j * y_affect) == false)
         {
-            if (map.can_visit(x + j * x_affect, y + j * y_affect) == false)
-            {
-                return false;
-            }
-        }
-        for (j = 0; j < snakes[snake_handles[i]].orignLength; j++)
-        {
-            map.add_body(x + j * x_affect, y + j * y_affect, snakes[snake_handles[i]]);
+            return false;
         }
     }
-}
-
-bool DecreteSnake::step()
-{
+    for (j = 0; j < snakes[snake_handle].orignLength; j++)
+    {
+        map.add_body(x + j * x_affect, y + j * y_affect, snakes[snake_handle]);
+        snakes[snake_handle].bodys.push_back(pos(x + j * x_affect, y + j * y_affect));
+    }
+    snakes[snake_handle].turn = turn;
+    return true;
 }
 
 DecreteSnake::DecreteSnake(Config config) : map(config.length, config.width)

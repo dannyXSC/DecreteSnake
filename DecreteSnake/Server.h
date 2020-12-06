@@ -4,35 +4,58 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-class Server{
-private:
-    int length,width;
+#include "./Map.h"
+#include "./Config.h"
+#include "./DecreteSnake.h"
+
+typedef int Server_State;
+
+class Server
+{
+protected:
+    GameHandle game;
+
+    GameMode game_mode;
+
+    int length, width;
 
     Map map;
 
-    SnakeType snake; 
+    vector<SnakeType> snakes;
+
+    //state
+    //we return int for the moment
+    Server_State state;
+
 public:
     //init
     Server();
     //destory
     ~Server();
-    
-    //if key down
-    void KeyDown();
-    //if mouse click
-    void MouseClick();
-    
-    //if the snake can exist
-    bool if_resurgence();
-    //maintain die
-    void MaintainDie();
-    
-    //maintain the info when the latest step down
-    void Step();
-    
-    //end
-    void End();
 
+    //tools
+    Map &get_map() { return this->map; }
+    int get_width() { return this->width; }
+    int get_length() { return this->length; }
+
+    //initial
+    virtual bool initial() = 0;
+
+    //if key down
+    virtual void KeyDown() = 0;
+    //if mouse click
+    virtual void MouseClick() = 0;
+
+    //if the snake can exist
+    virtual bool if_resurgence() = 0;
+    //maintain die
+    virtual void MaintainDie() = 0;
+
+    //maintain the info when the latest step down
+    virtual void Step() = 0;
+
+    //end
+    virtual void End() = 0;
 };
 
 #endif

@@ -39,6 +39,7 @@ public:
     {
         this->Length = orignLength;
         this->Speed = orignSpeed;
+        this->turn=Turn::NONE;
     }
 
     SnakeType(SnakeType &s) { this->duplicate(s); }
