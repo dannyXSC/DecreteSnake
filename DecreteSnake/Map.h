@@ -2,6 +2,7 @@
 #define SYMBOL_MAP
 
 #include <bits/stdc++.h>
+#include <random>
 using namespace std;
 
 #include "./AgentType.h"
@@ -35,14 +36,12 @@ class Map
 private:
     MapSlot **slots;
     int width, length;
-    default_random_engine random;
 
     void duplicate(Map &m)
     {
         this->slots = m.slots;
         this->width = m.width;
         this->length = m.length;
-        this->random = m.random;
     }
 
 public:
@@ -57,8 +56,6 @@ public:
         duplicate(m);
         return *this;
     }
-
-    void set_random(default_random_engine &random) { this->random = random; };
 
     bool add_wall(int x, int y, AgentType &wall);
     bool add_buff(int x, int y, AgentType &buff);
@@ -83,8 +80,8 @@ bool Map::random_add_food(AgentType &food)
 {
     for (int i = 0; i < length * width; i++)
     {
-        int x = this->random() % this->length;
-        int y = this->random() % this->width;
+        int x = rand() % this->length;
+        int y = rand() % this->width;
         if (slots[x][y].slot_type != SlotType::OBSTACLE && slots[x][y].occ_type == OccupyType::OCC_NONE)
         {
             slots[x][y].occ_type = OccupyType::OCC_FOOD;
@@ -99,8 +96,8 @@ bool Map::random_add_buff(AgentType &buff)
 {
     for (int i = 0; i < length * width; i++)
     {
-        int x = this->random() % this->length;
-        int y = this->random() % this->width;
+        int x = rand() % this->length;
+        int y = rand() % this->width;
         if (slots[x][y].slot_type == SlotType::BLANK)
         {
             slots[x][y].slot_type = SlotType::BUFF;
@@ -115,8 +112,8 @@ bool Map::random_add_wall(AgentType &wall)
 {
     while (1)
     {
-        int x = this->random() % this->length;
-        int y = this->random() % this->width;
+        int x = rand() % this->length;
+        int y = rand() % this->width;
         if (slots[x][y].slot_type != SlotType::OBSTACLE)
         {
             slots[x][y].slot_type = SlotType::OBSTACLE;

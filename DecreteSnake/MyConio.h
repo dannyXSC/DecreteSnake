@@ -1,3 +1,6 @@
+#ifdef __APPLE__
+#ifndef SYMBOL_MYCONIO
+#define SYMBOL_MYCONIO
 #include <stdio.h>
 #include <termios.h>
 #include <unistd.h> /*sleep(10); 10 secondes et sur windows c'est windows.h avec Sleep();*/
@@ -49,3 +52,6 @@ int kbhit(void)
     }
     return 0;
 }
+
+#endif  //include once
+#endif  //apple

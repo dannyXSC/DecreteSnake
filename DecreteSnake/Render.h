@@ -6,6 +6,11 @@ using namespace std;
 
 #include "./Server.h"
 
+#ifdef _WIN32
+#include <conio.h>
+#elif __APPLE__
+#include "./MyConio.h"
+#endif
 class SnakeRender
 {
 private:
@@ -35,7 +40,12 @@ void SnakeRender::Start(Server *server)
         map = server->get_map();
         update();
 
-        
+        //get command
+        if(kbhit())
+        {
+            //adjust the turn
+        }
+        server->Step();
     }
 }
 

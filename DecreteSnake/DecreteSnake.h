@@ -18,7 +18,6 @@ private:
     vector<AgentType> agents;
     vector<SnakeType> snakes;
     Map map;
-    default_random_engine random;
 
 public:
     DecreteSnake(Config config);
@@ -94,8 +93,7 @@ DecreteSnake::DecreteSnake(Config config) : map(config.length, config.width)
     this->agents = config.agents;
     this->snakes = config.snakes;
 
-    random.seed(time(0));
-    map.set_random(random);
+    srand(time(0));
 }
 
 bool DecreteSnake::random_add_food(int number, AgentType &food)
