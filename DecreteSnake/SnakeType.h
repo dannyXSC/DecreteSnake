@@ -33,13 +33,17 @@ public:
     //turn
     Turn turn;
 
+    //health
+    int health;
+
     /*functions*/
-    SnakeType(int ol = 5, int os = 1, ColorType color = ColorType::Black, double sr = -0.5)
-        : orignLength(ol), orignSpeed(os), StepReward(sr), StepRewards(0), Color(color), state(1)
+    SnakeType(int ol = 5, int os = 1, int h = 1, ColorType color = ColorType::Black, double sr = -0.5, Turn turn = Turn::NONE)
+        : orignLength(ol), orignSpeed(os), StepReward(sr), StepRewards(0), Color(color), state(0)
     {
         this->Length = orignLength;
         this->Speed = orignSpeed;
-        this->turn=Turn::NONE;
+        this->turn = turn;
+        this->health = h;
     }
 
     SnakeType(SnakeType &s) { this->duplicate(s); }

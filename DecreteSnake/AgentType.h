@@ -8,6 +8,7 @@ using namespace std;
 #include "RewardType.h"
 
 /*define*/
+typedef int AgentHandle;
 
 class AgentType
 {
@@ -19,10 +20,8 @@ public:
     //if eatable
     bool if_eatable;
 
-    int x, y;
-
-    AgentType(int x, int y, ColorType color, RewardType reward, bool if_eatable)
-        : x(x), y(y), color(color), reward(reward), if_eatable(if_eatable) {}
+    AgentType(ColorType color, RewardType reward, bool if_eatable)
+        : color(color), reward(reward), if_eatable(if_eatable) {}
 
     AgentType(AgentType &a)
     {
@@ -41,8 +40,6 @@ private:
         this->color = a.color;
         this->reward = a.reward;
         this->if_eatable = a.if_eatable;
-        this->x = a.x;
-        this->y = a.y;
     }
 };
 

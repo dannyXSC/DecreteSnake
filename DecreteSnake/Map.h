@@ -23,12 +23,27 @@ enum class OccupyType
 
 class MapSlot
 {
+private:
+    void duplicate(const MapSlot &ms)
+    {
+        this->slot_type = ms.slot_type;
+        this->occ_type = ms.occ_type;
+        this->occupier = ms.occupier;
+        this->container = ms.container;
+    }
+
 public:
     SlotType slot_type;
     OccupyType occ_type;
     void *occupier;
     void *container;
     MapSlot() : slot_type(SlotType::BLANK), occ_type(OccupyType::OCC_NONE), occupier(NULL), container(NULL) {}
+    MapSlot(const MapSlot &ms) { duplicate(ms); }
+    MapSlot &operator=(const MapSlot &ms)
+    {
+        duplicate(ms);
+        return *this;
+    }
 };
 
 class Map
@@ -57,6 +72,8 @@ public:
         return *this;
     }
 
+    MapSlot &get_info(int x, int y) { return slots[x][y]; }
+
     bool add_wall(int x, int y, AgentType &wall);
     bool add_buff(int x, int y, AgentType &buff);
     bool add_food(int x, int y, AgentType &food);
@@ -80,8 +97,8 @@ bool Map::random_add_food(AgentType &food)
 {
     for (int i = 0; i < length * width; i++)
     {
-        int x = rand() % this->length;
-        int y = rand() % this->width;
+        int x = rand() % (this->length - 1) + 1;
+        int y = rand() % (this->width - 1) + 1;
         if (slots[x][y].slot_type != SlotType::OBSTACLE && slots[x][y].occ_type == OccupyType::OCC_NONE)
         {
             slots[x][y].occ_type = OccupyType::OCC_FOOD;
@@ -96,8 +113,8 @@ bool Map::random_add_buff(AgentType &buff)
 {
     for (int i = 0; i < length * width; i++)
     {
-        int x = rand() % this->length;
-        int y = rand() % this->width;
+        int x = rand() % (this->length - 1) + 1;
+        int y = rand() % (this->width - 1) + 1;
         if (slots[x][y].slot_type == SlotType::BLANK)
         {
             slots[x][y].slot_type = SlotType::BUFF;
@@ -112,8 +129,8 @@ bool Map::random_add_wall(AgentType &wall)
 {
     while (1)
     {
-        int x = rand() % this->length;
-        int y = rand() % this->width;
+        int x = rand() % (this->length - 1) + 1;
+        int y = rand() % (this->width - 1) + 1;
         if (slots[x][y].slot_type != SlotType::OBSTACLE)
         {
             slots[x][y].slot_type = SlotType::OBSTACLE;

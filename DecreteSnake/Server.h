@@ -15,13 +15,9 @@ class Server
 protected:
     GameHandle game;
 
-    GameMode game_mode;
+    vector<SnakeHandle> snake_handles;
 
-    int length, width;
-
-    Map map;
-
-    vector<SnakeType> snakes;
+    vector<AgentHandle> agent_handles;
 
     //state
     //we return int for the moment
@@ -34,22 +30,17 @@ public:
     ~Server();
 
     //tools
-    Map &get_map() { return this->map; }
-    int get_width() { return this->width; }
-    int get_length() { return this->length; }
+    virtual Map &get_map() = 0;
+    virtual int get_width() = 0;
+    virtual int get_length() = 0;
 
     //initial
     virtual bool initial() = 0;
 
     //if key down
-    virtual void KeyDown() = 0;
+    virtual void KeyDown(char c) = 0;
     //if mouse click
-    virtual void MouseClick() = 0;
-
-    //if the snake can exist
-    virtual bool if_resurgence() = 0;
-    //maintain die
-    virtual void MaintainDie() = 0;
+    //virtual void MouseClick() = 0;
 
     //maintain the info when the latest step down
     virtual void Step() = 0;
