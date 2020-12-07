@@ -1,9 +1,12 @@
 #include <bits/stdc++.h>
-#include <unistd.h>
+#include "./Render.h"
+#include "./SingleServer.h"
+#include "./AgentType.h"
 using namespace std;
 
 int main()
 {
-    enum class color{white,black};
-    cout<<int(color::white);
+    SingleServer ss;
+    SnakeRender sr;
+    sr.Start(&ss);
 }

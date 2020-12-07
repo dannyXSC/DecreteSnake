@@ -3,6 +3,7 @@
 
 enum class Turn
 {
+    NONE,
     UP,
     DOWN,
     LEFT,

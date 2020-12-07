@@ -2,6 +2,7 @@
 #define SYMBOL_MAP
 
 #include <bits/stdc++.h>
+#include <random>
 using namespace std;
 
 #include "./AgentType.h"
@@ -22,12 +23,27 @@ enum class OccupyType
 
 class MapSlot
 {
+private:
+    void duplicate(const MapSlot &ms)
+    {
+        this->slot_type = ms.slot_type;
+        this->occ_type = ms.occ_type;
+        this->occupier = ms.occupier;
+        this->container = ms.container;
+    }
+
 public:
     SlotType slot_type;
     OccupyType occ_type;
     void *occupier;
     void *container;
     MapSlot() : slot_type(SlotType::BLANK), occ_type(OccupyType::OCC_NONE), occupier(NULL), container(NULL) {}
+    MapSlot(const MapSlot &ms) { duplicate(ms); }
+    MapSlot &operator=(const MapSlot &ms)
+    {
+        duplicate(ms);
+        return *this;
+    }
 };
 
 class Map
@@ -35,18 +51,16 @@ class Map
 private:
     MapSlot **slots;
     int width, length;
-    default_random_engine random;
 
     void duplicate(Map &m)
     {
         this->slots = m.slots;
         this->width = m.width;
         this->length = m.length;
-        this->random = m.random;
     }
 
 public:
-    Map(int length, int width);
+    Map(int length = 0, int width = 0);
     Map(Map &m) { duplicate(m); }
     ~Map()
     {
@@ -58,7 +72,7 @@ public:
         return *this;
     }
 
-    void set_random(default_random_engine &random) { this->random = random; };
+    MapSlot &get_info(int x, int y) { return slots[x][y]; }
 
     bool add_wall(int x, int y, AgentType &wall);
     bool add_buff(int x, int y, AgentType &buff);
@@ -83,8 +97,8 @@ bool Map::random_add_food(AgentType &food)
 {
     for (int i = 0; i < length * width; i++)
     {
-        int x = this->random() % this->length;
-        int y = this->random() % this->width;
+        int x = rand() % (this->length - 1) + 1;
+        int y = rand() % (this->width - 1) + 1;
         if (slots[x][y].slot_type != SlotType::OBSTACLE && slots[x][y].occ_type == OccupyType::OCC_NONE)
         {
             slots[x][y].occ_type = OccupyType::OCC_FOOD;
@@ -99,8 +113,8 @@ bool Map::random_add_buff(AgentType &buff)
 {
     for (int i = 0; i < length * width; i++)
     {
-        int x = this->random() % this->length;
-        int y = this->random() % this->width;
+        int x = rand() % (this->length - 1) + 1;
+        int y = rand() % (this->width - 1) + 1;
         if (slots[x][y].slot_type == SlotType::BLANK)
         {
             slots[x][y].slot_type = SlotType::BUFF;
@@ -115,8 +129,8 @@ bool Map::random_add_wall(AgentType &wall)
 {
     while (1)
     {
-        int x = this->random() % this->length;
-        int y = this->random() % this->width;
+        int x = rand() % (this->length - 1) + 1;
+        int y = rand() % (this->width - 1) + 1;
         if (slots[x][y].slot_type != SlotType::OBSTACLE)
         {
             slots[x][y].slot_type = SlotType::OBSTACLE;
@@ -143,7 +157,7 @@ AgentType *Map::delete_buff(int x, int y)
 
 AgentType *Map::delete_wall(int x, int y)
 {
-    if (!can_visit(x, y))
+    if (slots[x][y].slot_type == SlotType::OBSTACLE)
     {
         AgentType *p = (AgentType *)slots[x][y].container;
         slots[x][y].slot_type = SlotType::BLANK;
@@ -157,7 +171,7 @@ AgentType *Map::delete_wall(int x, int y)
 
 SnakeType *Map::delete_body(int x, int y)
 {
-    if (can_visit(x, y) && slots[x][y].occ_type == OccupyType::OCC_BODY)
+    if (slots[x][y].slot_type != SlotType::OBSTACLE && slots[x][y].occ_type == OccupyType::OCC_BODY)
     {
         SnakeType *p = (SnakeType *)slots[x][y].occupier;
         slots[x][y].occ_type = OccupyType::OCC_NONE;
@@ -169,7 +183,7 @@ SnakeType *Map::delete_body(int x, int y)
 
 AgentType *Map::delete_food(int x, int y)
 {
-    if (can_visit(x, y) && slots[x][y].occ_type == OccupyType::OCC_FOOD)
+    if (slots[x][y].slot_type != SlotType::OBSTACLE && slots[x][y].occ_type == OccupyType::OCC_FOOD)
     {
         AgentType *p = (AgentType *)slots[x][y].occupier;
         slots[x][y].occ_type = OccupyType::OCC_NONE;
@@ -181,7 +195,7 @@ AgentType *Map::delete_food(int x, int y)
 
 bool Map::add_buff(int x, int y, AgentType &buff)
 {
-    if (!can_visit(x, y))
+    if (slots[x][y].slot_type == SlotType::OBSTACLE)
     {
         return false;
     }
@@ -214,7 +228,7 @@ bool Map::add_food(int x, int y, AgentType &food)
 
 bool Map::add_wall(int x, int y, AgentType &wall)
 {
-    if (can_visit(x, y))
+    if (slots[x][y].slot_type == SlotType::OBSTACLE)
     {
         return false;
     }
@@ -226,22 +240,25 @@ bool Map::add_wall(int x, int y, AgentType &wall)
 
 Map::Map(int length, int width)
 {
-    this->length = length;
-    this->width = width;
-    this->slots = new MapSlot *[length];
-    if (this->slots == NULL)
+    if (length != 0 && width != 0)
     {
-        //error
-        cout << "overflow!" << endl;
-        exit(-1);
-    }
-    for (int i = 0; i < length; i++)
-    {
-        this->slots[i] = new MapSlot[width];
-        if (this->slots[i] == NULL)
+        this->length = length;
+        this->width = width;
+        this->slots = new MapSlot *[length];
+        if (this->slots == NULL)
         {
-            cout << "overflow" << endl;
+            //error
+            cout << "overflow!" << endl;
             exit(-1);
+        }
+        for (int i = 0; i < length; i++)
+        {
+            this->slots[i] = new MapSlot[width];
+            if (this->slots[i] == NULL)
+            {
+                cout << "overflow" << endl;
+                exit(-1);
+            }
         }
     }
 }
@@ -252,7 +269,7 @@ inline bool Map::can_visit(int x, int y)
     {
         return false;
     }
-    if (slots[x][y].slot_type == SlotType::BLANK || slots[x][y].slot_type == SlotType::BUFF)
+    if ((slots[x][y].slot_type == SlotType::BLANK || slots[x][y].slot_type == SlotType::BUFF) && slots[x][y].occ_type != OccupyType::OCC_BODY)
     {
         return true;
     }
